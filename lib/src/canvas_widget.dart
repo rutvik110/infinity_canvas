@@ -711,7 +711,7 @@ class _InfinityCanvasState extends State<InfinityCanvas> {
     if (event.kind == PointerDeviceKind.trackpad) {
       if (!_isPanEnabled) return;
       final worldDelta = _controller!.camera.deltaScreenToWorld(
-        -event.scrollDelta,
+        event.scrollDelta,
       );
       _controller!.camera.translateWorld(worldDelta);
       return;

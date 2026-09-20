@@ -1,3 +1,7 @@
+## 0.11.0+local
+
+- Trackpad pan uses `event.scrollDelta` instead of `-event.scrollDelta`.
+
 ## 0.11.0
 
 **New features**
