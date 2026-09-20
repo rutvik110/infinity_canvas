@@ -642,52 +642,33 @@ class _InfinityCanvasState extends State<InfinityCanvas> {
   void _onCanvasScaleUpdate(ScaleUpdateDetails details) {
     if (_controller == null || _activeDragCount > 0) return;
 
-    final localFocal = details.localFocalPoint;
-
-    if (details.pointerCount >= 2) {
-      final isPinch =
-          _isPinchZoomEnabled && (details.scale - 1.0).abs() > 0.02;
-      if (isPinch) {
-        final referenceWorld =
-            _gestureReferenceFocalWorld ??
-            _controller!.camera.screenToWorld(localFocal);
-        final startScale = _gestureStartScale ?? _controller!.camera.scale;
-        final desiredScale = startScale * details.scale;
-
-        _controller!.camera.setScale(desiredScale, focalWorld: referenceWorld);
-
-        final focalWorldAfter = _controller!.camera.screenToWorld(localFocal);
-        final correction = referenceWorld - focalWorldAfter;
-        if (correction != Offset.zero) {
-          _controller!.camera.translateWorld(correction);
-        }
-        _gestureReferenceFocalWorld = _controller!.camera.screenToWorld(
-          localFocal,
-        );
-        return;
+    final camera = _controller!.camera;
+    if (details.pointerCount >= 2 &&
+        _isPinchZoomEnabled &&
+        (details.scale - 1.0).abs() > 0.02) {
+      final localFocal = details.localFocalPoint;
+      final referenceWorld =
+          _gestureReferenceFocalWorld ?? camera.screenToWorld(localFocal);
+      camera.setScale(
+        (_gestureStartScale ?? camera.scale) * details.scale,
+        focalWorld: referenceWorld,
+      );
+      final focalWorldAfter = camera.screenToWorld(localFocal);
+      final dx = referenceWorld.dx - focalWorldAfter.dx;
+      final dy = referenceWorld.dy - focalWorldAfter.dy;
+      if (dx != 0.0 || dy != 0.0) {
+        camera.translateWorld(Offset(dx, dy));
       }
-
-      if (_isPanEnabled && details.focalPointDelta != Offset.zero) {
-        final worldDelta = _controller!.camera.deltaScreenToWorld(
-          details.focalPointDelta,
-        );
-        _controller!.camera.translateWorld(worldDelta);
-        _gestureReferenceFocalWorld = _controller!.camera.screenToWorld(
-          localFocal,
-        );
-      }
+      _gestureReferenceFocalWorld = referenceWorld;
       return;
     }
 
-    if (_isPanEnabled && details.focalPointDelta != Offset.zero) {
-      final worldDelta = _controller!.camera.deltaScreenToWorld(
-        details.focalPointDelta,
-      );
-      _controller!.camera.translateWorld(worldDelta);
-      _gestureReferenceFocalWorld = _controller!.camera.screenToWorld(
-        localFocal,
-      );
-    }
+    if (!_isPanEnabled) return;
+    final delta = details.focalPointDelta;
+    if (delta.dx == 0.0 && delta.dy == 0.0) return;
+    final scale = camera.scale;
+    if (scale == 0.0) return;
+    camera.translateWorld(Offset(delta.dx / scale, delta.dy / scale));
   }
 
   void _onCanvasScaleEnd(ScaleEndDetails details) {
