@@ -645,7 +645,9 @@ class _InfinityCanvasState extends State<InfinityCanvas> {
     final localFocal = details.localFocalPoint;
 
     if (details.pointerCount >= 2) {
-      if (_isPinchZoomEnabled) {
+      final isPinch =
+          _isPinchZoomEnabled && (details.scale - 1.0).abs() > 0.02;
+      if (isPinch) {
         final referenceWorld =
             _gestureReferenceFocalWorld ??
             _controller!.camera.screenToWorld(localFocal);
@@ -711,7 +713,7 @@ class _InfinityCanvasState extends State<InfinityCanvas> {
     if (event.kind == PointerDeviceKind.trackpad) {
       if (!_isPanEnabled) return;
       final worldDelta = _controller!.camera.deltaScreenToWorld(
-        event.scrollDelta,
+        -event.scrollDelta,
       );
       _controller!.camera.translateWorld(worldDelta);
       return;

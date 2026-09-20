@@ -794,7 +794,7 @@ void main() {
     );
     final after = controller.camera.worldToScreen(Offset.zero);
 
-    expect(after.dy, closeTo(before.dy + 36, 0.01));
+    expect(after.dy, closeTo(before.dy - 36, 0.01));
     expect(controller.camera.scale, closeTo(1.0, 1e-9));
   });
 

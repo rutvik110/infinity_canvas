@@ -1,6 +1,7 @@
 ## 0.11.0+local
 
-- Trackpad pan uses `event.scrollDelta` instead of `-event.scrollDelta`.
+- Two-finger trackpad pans when scale is ~1 instead of using the pinch
+  focal-lock, which inverted pan on every axis.
 
 ## 0.11.0
 
